@@ -585,11 +585,17 @@ void __init mount_root(void)
 	}
 #ifdef CONFIG_BLOCK
 	{
-		int err = create_dev("/dev/root", ROOT_DEV);
-
-		if (err < 0)
-			pr_emerg("Failed to create /dev/root: %d\n", err);
-		mount_block_root("/dev/root", root_mountflags);
+		if (saved_root_name[0] == '/') {
+			int err = create_dev(saved_root_name, ROOT_DEV);
+			if (err < 0)
+				pr_emerg("Failed to create %s: %d\n", saved_root_name, err);
+			mount_block_root(saved_root_name, root_mountflags);
+		} else {
+			int err = create_dev("/dev/root", ROOT_DEV);
+			if (err < 0)
+				pr_emerg("Failed to create /dev/root: %d\n", err);
+			mount_block_root("/dev/root", root_mountflags);
+		}
 	}
 #endif
 }

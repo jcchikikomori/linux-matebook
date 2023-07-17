@@ -467,10 +467,14 @@ static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
 
 static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
 {
+	u64 lat;
+
 	if (!wbt_rq_qos(q))
 		return -EINVAL;
 
-	return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
+	lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
+
+	return sprintf(page, "%llu\n", lat);
 }
 
 static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
